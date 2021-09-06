@@ -1,18 +1,81 @@
 <template>
-  <p class="register__text">Register</p>
   <form @submit.prevent class="register">
-    <input class="register__input" v-model="user.name" placeholder="Name" />
-    <input class="register__input" v-model="user.password" placeholder="Password" />
-    <button class="register__btn">Войти</button>
-    <button class="register__btn">Еще нет аккаунта? Зарегистрироваться</button>
+    <div v-if="isShowSign">
+      <div class="ribbon"></div>
+      <div class="login">
+        <h1>Sign in</h1>
+        <p>This will be an amazing experience</p>
+
+        <div class="input">
+          <div class="blockinput">
+            <i class="icon-envelope-alt"></i>
+            <input v-model="userLog.name" placeholder="Name" />
+          </div>
+          <div class="blockinput">
+            <i class="icon-unlock"></i>
+            <input v-model="userLog.password" placeholder="Password" />
+          </div>
+        </div>
+        <button class="register__btn" @click="sign()">
+          Войти
+        </button>
+        <button class="register__btn" @click="showReg()">
+          Еще нет аккаунта? Зарегистрироваться
+        </button>
+      </div>
+      <p v-if="isRegOk" style="margin-top: 10px;">
+        Вы успешно зарегистрировались
+      </p>
+      <p v-if="isSign" style="margin-top: 10px;">
+        Вы ввели неверные данные
+      </p>
+    </div>
+    <div v-else-if="!isShowSign">
+      <div class="ribbon"></div>
+      <div class="login">
+        <h1>Sign up</h1>
+        <p>This will be an amazing experience</p>
+
+        <div class="input">
+          <div class="blockinput">
+            <i class="icon-envelope-alt"></i>
+            <input v-model="user.name" placeholder="Name" />
+          </div>
+          <div class="blockinput">
+            <i class="icon-unlock"></i>
+            <input v-model="user.password" placeholder="Password" />
+          </div>
+        </div>
+        <button class="register__btn" @click="addNewUser()">
+          Зарегистрироваться
+        </button>
+        <button class="register__btn" @click="showLogin()">
+          Уже есть аккаунт? Войти
+        </button>
+      </div>
+      <p v-if="isOk" style="margin-top: 10px;">
+        Такой аккаунт уже существует. Попробуйте друго имя пользователя
+      </p>
+    </div>
   </form>
 </template>
 
 <script>
+import store from "@/store/index.js";
 export default {
   data() {
     return {
+      isOk: false,
+      isSign: false,
+      isRegOk: false,
+      isShowSign: true,
+
       user: {
+        id: Math.random(1, 10000),
+        name: "",
+        password: "",
+      },
+      userLog: {
         name: "",
         password: "",
       },
@@ -29,44 +92,234 @@ export default {
         },
         {
           id: 3,
-          name: "Andrey",
+          name: "Andrey1",
           password: "12345",
         },
         {
           id: 4,
-          name: "Vitya",
+          name: "Vitya2",
           password: "12345",
         },
         {
           id: 5,
-          name: "Kolya",
+          name: "Kolya3",
           password: "12345",
         },
         {
           id: 6,
-          name: "Andrey",
+          name: "Andrey4",
           password: "12345",
         },
         {
           id: 7,
-          name: "Vitya",
+          name: "Vitya444",
           password: "12345",
         },
         {
           id: 8,
-          name: "Kolya",
+          name: "Kolya222",
           password: "12345",
         },
         {
           id: 9,
-          name: "Andrey",
+          name: "Andrey1212",
           password: "12345",
         },
       ],
     };
   },
+  emits: ["enter"],
+  methods: {
+    addNewUser() {
+      let arr = [];
+      for (let i = 0; i < this.users.length; i++) {
+        arr.push(this.users[i]["name"] === this.user.name);
+      }
+      if (arr.includes(true)) {
+        this.isOk = true;
+        this.isRegOk = false;
+      } else {
+        this.users.push({
+          id: this.users[this.users.length - 1]["id"] + 1,
+          name: this.user.name,
+          password: this.user.password,
+        });
+        this.isOk = false;
+        this.isShowSign = true;
+        this.isRegOk = true;
+      }
 
+      console.log(this.users);
+    },
+    showLogin() {
+      this.isShowSign = true;
+    },
+    showReg() {
+      this.isShowSign = false;
+    },
+    sign() {
+      if (
+        this.users.some(
+          (x) =>
+            x["name"] === this.userLog.name &&
+            x["password"] === this.userLog.password
+        )
+      ) {
+        this.isSign = false;
+        this.isRegOk = false;
+        this.$router.push("/about");
+
+        store.commit("showName", {
+          name: this.userLog.name,
+        });
+        store.commit("login");
+      } else {
+        this.isSign = true;
+        store.commit("notlogin");
+      }
+    },
+  },
 };
 </script>
 
-<style></style>
+<style scoped>
+h2 {
+  text-align: center;
+  color: #f1f2f4;
+  text-shadow: 0 1px 0 #000;
+}
+a {
+  text-decoration: none;
+  color: #ec5c93;
+}
+.ribbon {
+  background: rgba(200, 200, 200, 0.5);
+  width: 50px;
+  height: 70px;
+  margin: 0 auto;
+  position: relative;
+  top: 19px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+}
+.ribbon:before {
+  content: "";
+  display: block;
+  width: 15px;
+  height: 15px;
+  background: #4e535b;
+  border: 4px solid #cfd0d1;
+  margin: 18px auto;
+  box-shadow: inset 0 0 5px #000, 0 0 2px #000, 0 1px 1px 1px #a7a8ab;
+  border-radius: 100%;
+}
+.login {
+  background: #f1f2f4;
+  border-bottom: 2px solid #c5c5c8;
+  border-radius: 5px;
+  text-align: center;
+  color: #36383c;
+  text-shadow: 0 1px 0 #fff;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 15px 40px 20px 40px;
+  box-shadow: 0 0 3px #000;
+}
+.login:before {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 4px;
+  background: #4e535b;
+  border-radius: 5px;
+  border-bottom: 1px solid #ffffff;
+  border-top: 2px solid #cbcbcd;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.6em;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+p {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-weight: 300;
+  color: #7b808a;
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+.input {
+  text-align: right;
+  background: #e5e7e9;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 0 3px #65686e;
+  border-bottom: 1px solid #fff;
+}
+input {
+  width: 260px;
+  background: transparent;
+  border: 0;
+  line-height: 3.6em;
+  box-sizing: border-box;
+  color: #71747a;
+  font-family: "Open Sans", Arial, sans-serif;
+  text-shadow: 0 1px 0 #fff;
+}
+input:focus {
+  outline: none;
+}
+.blockinput {
+  border-bottom: 1px solid #bdbfc2;
+  border-top: 1px solid #ffffff;
+}
+.blockinput:first-child {
+  border-top: 0;
+}
+.blockinput:last-child {
+  border-bottom: 0;
+}
+.blockinput i {
+  padding-right: 10px;
+  color: #b1b3b7;
+  text-shadow: 0 1px 0 #fff;
+}
+::-webkit-input-placeholder {
+  color: #71747a;
+  font-family: "Open Sans", Arial, sans-serif;
+  text-shadow: 0 1px 0 #fff;
+}
+button {
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  line-height: 2em;
+  background: rgba(114, 212, 202, 1);
+  border-radius: 5px;
+  border: 0;
+  cursor: pointer;
+  border-top: 1px solid #b2ece6;
+  box-shadow: 0 0 0 1px #46a294, 0 2px 2px #808389;
+  color: #ffffff;
+  font-size: 1.5em;
+  text-shadow: 0 1px 2px #21756a;
+}
+button:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(107, 198, 186, 1) 0%,
+    rgba(57, 175, 154, 1) 100%
+  );
+}
+button:active {
+  box-shadow: inset 0 0 5px #000;
+  background: linear-gradient(
+    to bottom,
+    rgba(57, 175, 154, 1) 0%,
+    rgba(107, 198, 186, 1) 100%
+  );
+}
+</style>

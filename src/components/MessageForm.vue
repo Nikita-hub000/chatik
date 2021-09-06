@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import store from '@/store/index.js'
 export default {
   data() {
     return {
@@ -18,7 +19,7 @@ export default {
     send() {
       this.message = {
         id: Math.random(),
-        name: "Kolya",
+        name: store.state.name.name,
         text: this.message.title,
         date: `${
           new Date().getHours().length === 1
