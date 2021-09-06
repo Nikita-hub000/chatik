@@ -1,5 +1,9 @@
 # chatik
 
+***
+actual version is [1.1.0](https://nikita-hub000.github.io/chatik/)
+***
+
 ## Project setup
 ```
 npm install
